@@ -13,9 +13,11 @@ This means it's the caller's responsibility to add css etc for the page's layout
 
 ### Show me the code!
 ```html
-<div data-inject-src="http://info.cern.ch/" style="height: 175px;"> </div>
+<div data-inject-src="{example.com}" style="height: {expected height}px;"> </div>
 ```
 
 When the attribute **data-inject-src** is put on any element, inject will download the url specified in the value, and will dump the content between the opening, and closing body tags.
+The inline height style can be omitted, but it's recommended so the layout of the page doesn't change once the external html is injected.
+If the element doesn't take the full screen width, then adding a width to the element is also recommended. Of course the height and width could be defined in a css class.
 
 This software is released under the [MIT License](http://opensource.org/licenses/MIT).
