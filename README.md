@@ -20,4 +20,10 @@ When the attribute **data-inject-src** is put on any element, inject will downlo
 The inline height style can be omitted, but it's recommended so the layout of the page doesn't change once the external html is injected.
 If the element doesn't take the full screen width, then adding a width to the element is also recommended. Of course the height and width could be defined in a css class.
 
+#### Warning
+<span style="color:red;">
+In general you should trust the source that your loading from. While script, and styles tags are removed, inline script (such as onlick events) and styles remain.
+The scripts tags aren't removed to prevent [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_%28XSS%29), rather they're removed because the framework doesn't support them.
+</span>
+
 This software is released under the [MIT License](http://opensource.org/licenses/MIT).
