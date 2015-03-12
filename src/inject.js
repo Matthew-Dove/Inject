@@ -1,5 +1,4 @@
 (function () {
-	
 	/* Build the url for each injection element to get the source's html. */
 	var getApiUrl = (function () {
 		var protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
@@ -10,7 +9,7 @@
 			return protocol + baseUrl + yql + '%27' + encodeURIComponent(queryUrl) + '%27';
 		};
 	})();
-
+	
 	/* Get the browser's xml parser. */
 	var getXmlParser = (function() {
 		if (typeof window.DOMParser !== 'undefined') {
@@ -31,11 +30,11 @@
 				return null;
 			};
 		}
-	}());
+	})();
 	
 	var getXhr = function () {
 		var xmlRequest = null;
-	
+		
 		if (typeof window.XMLHttpRequest !== 'undefined') {
 			xmlRequest = new XMLHttpRequest();
 		}
@@ -45,7 +44,7 @@
 		else {
 			console.log('inject - no xml request object found.');
 		}
-	
+		
 		return xmlRequest;
 	};
 	
@@ -62,7 +61,6 @@
 	
 	/* Use the browser's xml request object to get the source's html. */
 	var getXml = function (url, callback) {
-		
 		var xhr = getXhr();
 		if (xhr !== null) {
 			xhr.open('GET', url, true);
@@ -140,7 +138,6 @@
 	};
 	
 	window.setTimeout(function () {
-		
 		/* Get all elements marked with the inject attribute, and inject them with the requested source. */
 		var injectees = elementSelector(injectSrcAttr);
 		for (var i = 0, n = injectees.length; i < n; i++) {
@@ -148,5 +145,4 @@
 		}
 		
 	}, 0);
-	
 })();
