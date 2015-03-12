@@ -16,7 +16,6 @@ The same-origin policy is circumvented by using Yahoo! as a proxy, so you can do
 ```html
 <div data-inject-src="{example.com}" style="height: {expected height}px;"> </div>
 ```
-
 [Example](https://rawgit.com/Matthew-Dove/Inject/master/src/example.html)
 
 When the attribute **data-inject-src** is put on any element, inject will download the url specified in the value, and will dump the content between the opening, and closing body tags.

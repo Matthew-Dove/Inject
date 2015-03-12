@@ -2,7 +2,7 @@
 	
 	/* Build the url for each injection element to get the source's html. */
 	var getApiUrl = (function () {
-		var protocol = window.location.protocol === 'https:' ? 'http:' : 'http:';
+		var protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
 		var baseUrl = '//query.yahooapis.com/v1/public/yql?q=';
 		var yql = encodeURIComponent('select * from html where url = ');
 		return function (queryUrl) {
