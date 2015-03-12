@@ -7,7 +7,7 @@
 			return function (queryUrl) {
 				return protocol + baseUrl + yql + '%27' + encodeURIComponent(queryUrl) + '%27'; /* The single quote isn't encoded correctly, so the safe encoded value is hard coded. */
 			};
-		})(window.location.protocol === 'https:' ? 'http:' : 'http:', '//query.yahooapis.com/v1/public/yql?q=', encodeURIComponent('select * from html where url = '));
+		})(window.location.protocol === 'https:' ? 'https:' : 'http:', '//query.yahooapis.com/v1/public/yql?q=', encodeURIComponent('select * from html where url = '));
 		
 		/* Get the browser's xml parser. */
 		function xmlParser(xml) {
