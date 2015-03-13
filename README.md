@@ -5,10 +5,10 @@ A javascript file that will pull html from other webpages, and inject into your 
 
 ### When do I use this?
 If you want control over the html being imported into your webpage, iframes don't play nicely with the parent's css and javascript.
-For example you can use your own javascript or css to target the injected html which is otherwise hard if you don't have access to the request html's source.
+For example you can use your own javascript or css to target the injected html which is otherwise hard if you don't have access to the requested html's source.
 
 ### Remarks
-Under the hood inject uses [YQL](https://developer.yahoo.com/yql/) to get the request page's html, and any style or script tags from the source are stripped out before being injected into your page.
+Under the hood inject uses [YQL](https://developer.yahoo.com/yql/) to get the requested page's html, any style or script tags from the source are stripped out before being injected into your page.
 This means it's the caller's responsibility to add css etc for the page's layout (if desired).
 The same-origin policy is circumvented by using Yahoo! as a proxy, so you can do more then AJAX can, and by extension [jQuery's .load()](https://api.jquery.com/load/) which are limited by having extra security.
 
