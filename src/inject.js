@@ -100,13 +100,7 @@
             xhr.open('GET', url, true);
             xhr.onerror = function () { console.log('inject - error making a request for a source\'s HTML.'); };
             xhr.onload = function () { callback(xhr.responseText); };
-            
-            try {
-                xhr.send(null);
-            } catch (ex) {
-                console.log('inject - error sending the request for the page\'s content.');
-                console.log(ex);
-            }
+            xhr.send(null);
         }
     };
     

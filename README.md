@@ -1,7 +1,7 @@
 # Inject.js
 
 ### What is it?
-A javascript file that will pull html from other webpages, and inject into your document, similar to an iframe.
+A javascript file that will pull html from other webpages, and inject that html into your document, similar to an iframe.
 
 ### When do I use this?
 If you want control over the html being imported into your webpage, iframes don't play nicely with the parent's css and javascript.
