@@ -1,24 +1,54 @@
 (function () {
+    /* Add text/html support for browsers that don't have it on the DOMParser object. */
+    if (typeof DOMParser !== 'undefined') {
+        (function (DOMParser) {
+            var DOMParser_proto = DOMParser.prototype
+            var real_parseFromString = DOMParser_proto.parseFromString;
+            
+            try {
+                if ((new DOMParser).parseFromString('', 'text/html')) {
+                    return;
+                }
+            } catch (e) { }
+            
+            DOMParser_proto.parseFromString = function (markup, type) {
+                if (/^\s*text\/html\s*(?:;|$)/i.test(type)) {
+                    var doc = document.implementation.createHTMLDocument('');
+                    if (markup.toLowerCase().indexOf('<!doctype') > -1) {
+                        doc.documentElement.innerHTML = markup;
+                    }
+                    else {
+                        doc.body.innerHTML = markup;
+                    }
+                    return doc;
+                } else {
+                    return real_parseFromString.apply(this, arguments);
+                }
+            };
+        }(DOMParser));
+    }
+    
     /* Build the url for each injection element to get the source's html. */
-    var getApiUrl = (function () {
+    var createApiUrl = (function () {
         var protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
         var baseUrl = '//query.yahooapis.com/v1/public/yql?q=';
         var yql = encodeURIComponent('select * from html where url = ');
+
         return function (queryUrl) {
             /* The single quote isn't encoded correctly, so the safe encoded value is hard coded. */
             return protocol + baseUrl + yql + '%27' + encodeURIComponent(queryUrl) + '%27';
         };
     })();
     
-    /* Get the browser's xml parser. */
-    var getXmlParser = (function() {
+    /* Get the browser's HTML parser. */
+    var createHtmlParser = (function () {
         if (typeof window.DOMParser !== 'undefined') {
             return function (xml) {
-                return (new window.DOMParser()).parseFromString(xml, 'text/xml');
+                return (new DOMParser()).parseFromString(xml, 'text/html');
             };
-        } else if (typeof window.ActiveXObject !== 'undefined' && new window.ActiveXObject('Microsoft.XMLDOM')) {
+        } else if (typeof ActiveXObject !== 'undefined' && new ActiveXObject('Microsoft.XMLDOM')) {
             return function (xml) {
-                var xmlDoc = new window.ActiveXObject('Microsoft.XMLDOM');
+                var xmlDoc = new ActiveXObject('Microsoft.XMLDOM');
                 xmlDoc.async = 'false';
                 xmlDoc.loadXML(xml);
                 return xmlDoc;
@@ -31,43 +61,45 @@
         }
     })();
     
-    var getXhr = (function () {
-            var xmlRequest = null;
-            
-            if (typeof window.XMLHttpRequest !== 'undefined') {
-                xmlRequest = function () {
-                    return new XMLHttpRequest();
-                };
-            }
-            else if (typeof window.ActiveXObject !== 'undefined' && new window.ActiveXObject('Microsoft.XMLHTTP')) {
-                xmlRequest = function () {
-                    return new window.ActiveXObject('Microsoft.XMLHTTP');
-                };
-            }
-            else {
-                console.log('inject - no xml request object found.');
-            }
-
-            return xmlRequest;
-        })();
+    var createXhr = (function () {
+        var xmlRequest = null;
+        
+        function isCorsEnabled() {
+            var xhr = new XMLHttpRequest();
+            return 'withCredentials' in xhr;
+        }
+        
+        if (typeof XMLHttpRequest !== 'undefined' && isCorsEnabled()) {
+            xmlRequest = function () {
+                return new XMLHttpRequest();
+            };
+        }
+        else if (typeof XDomainRequest !== 'undefined') {
+            xmlRequest = function () {
+                return new XDomainRequest();
+            };
+        }
+        else {
+            console.log('inject - cors isn\'t supported.');
+        }
+        
+        return xmlRequest;
+    })();
     
     var xhrStateChange = function (xhr, callback) {
-        if (xhr.readyState == 4) {
-            if (xhr.status == 200) {
-                callback(xhr.responseText);
-            }
-            else {
-                console.log('inject - expected status 200 but received status: ' + xhr.status);
-            }
+        console.log(xhr.readyState);
+        if (xhr.readyState === 4) {
+            callback(xhr.responseText);
         }
     };
     
     /* Use the browser's xml request object to get the source's html. */
-    var getXml = function (url, callback) {
-        var xhr = getXhr();
+    var getHtml = function (url, callback) {
+        var xhr = createXhr();
         if (xhr !== null) {
             xhr.open('GET', url, true);
-            xhr.onreadystatechange = function () { xhrStateChange(xhr, callback); };
+            xhr.onerror = function () { console.log('inject - error making a request for a source\'s HTML.'); };
+            xhr.onload = function () { callback(xhr.responseText); };
             
             try {
                 xhr.send(null);
@@ -108,8 +140,9 @@
         return garbage;
     };
     
-    var injectResponse = function (response, injectee, queryUrl) {
-        var parser = getXmlParser(response);
+    /* Remove unwanted nodes, and put the rest as HTML into the element that requested the HTML injection. */
+    var injectResponse = function (response, injectee) {
+        var parser = createHtmlParser(response);
         if (parser !== null) {
             var bodyMatch = parser.getElementsByTagName('body');
             if (bodyMatch.length === 1) {
@@ -125,26 +158,27 @@
                 }
                 
                 /* Inject the html. */
-                injectee.innerHTML = body.innerHTML;
+                injectee.innerHTML = typeof body.innerHTML === 'undefined' ? body.xml : body.innerHTML;
             } else {
-                console.log('inject - no body tag found for the url: ' + queryUrl);
+                console.log('inject - no body tag found.');
             }
         }
     };
     
+    /* The attribue to look for when finding elements taht require injection. */
     var injectSrcAttr = 'data-inject-src';
     
-    var injectXML = function (injectee) {
+    /* Get the source's html, and inject it into the element that requested it. */
+    var injectHtml = function (injectee) {
         var queryUrl = injectee.getAttribute(injectSrcAttr);
-        /* Get the source's html, and inject it into the element that requested it. */
-        getXml(getApiUrl(queryUrl), function (response) { injectResponse(response, injectee, queryUrl); });
+        getHtml(createApiUrl(queryUrl), function (response) { injectResponse(response, injectee); });
     };
     
-    window.setTimeout(function () {
+    setTimeout(function () {
         /* Get all elements marked with the inject attribute, and inject them with the requested source. */
         var injectees = elementSelector(injectSrcAttr);
         for (var i = 0, n = injectees.length; i < n; i++) {
-            injectXML(injectees[i]);
+            injectHtml(injectees[i]);
         }
     }, 0);
 })();

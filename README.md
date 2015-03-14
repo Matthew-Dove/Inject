@@ -10,6 +10,7 @@ For example you can use your own javascript or css to target the injected html w
 ### Remarks
 Under the hood inject uses [YQL](https://developer.yahoo.com/yql/) to get the requested page's html, any style or script tags from the source are stripped out before being injected into your page.
 This means it's the caller's responsibility to add css etc for the page's layout (if desired).
+Works with any [CORS enabled browser](http://caniuse.com/#feat=cors).
 The same-origin policy is circumvented by using Yahoo! as a proxy, so you can do more then AJAX can, and by extension [jQuery's .load()](https://api.jquery.com/load/) which are limited by having extra security.
 
 ### Show me the code!
