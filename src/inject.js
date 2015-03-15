@@ -86,13 +86,6 @@
         return xmlRequest;
     })();
     
-    var xhrStateChange = function (xhr, callback) {
-        console.log(xhr.readyState);
-        if (xhr.readyState === 4) {
-            callback(xhr.responseText);
-        }
-    };
-    
     /* Use the browser's xml request object to get the source's html. */
     var getHtml = function (url, callback) {
         var xhr = createXhr();
