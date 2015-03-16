@@ -116,7 +116,7 @@
                 }
                 
                 /* Inject the html. */
-                injectee.innerHTML =  body.innerHTML || body.childNodes[0].nodeValue || body.xml || response;
+                injectee.innerHTML =  body.innerHTML || body.xml || response;
             } else {
                 console.log('inject - no body tag found.');
             }
