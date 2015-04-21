@@ -11,8 +11,8 @@
         };
     })();
     
-    /* Get the browser's HTML parser. */
-    var createHtmlParser = (function () {
+    /* Get the browser's XML parser. */
+    var createXmlParser = (function () {
         if (typeof window.DOMParser !== 'undefined') {
             return function (xml) {
                 return (new DOMParser()).parseFromString(xml, 'text/xml');
@@ -88,31 +88,31 @@
         }
     }());
     
-    var removeNodes = function (garbage, name) {
-        var foundGarbage = document.body.getElementsByTagName(name);
+    var removeNodes = function (xmlDocument, trash, name) {
+        var garbage = xmlDocument.getElementsByTagName(name);
         
-        for (var i = 0, n = foundGarbage.length; i < n; i++) {
-            garbage.push(foundGarbage[i]);
+        for (var i = 0, n = garbage.length; i < n; i++) {
+            trash.push(garbage[i]);
         }
         
-        return garbage;
+        return trash;
     };
     
     /* Remove unwanted nodes, and put the rest as HTML into the element that requested the HTML injection. */
     var injectResponse = function (response, injectee) {
-        var parser = createHtmlParser(response);
+        var parser = createXmlParser(response);
         if (parser !== null) {
             var bodyMatch = parser.getElementsByTagName('body');
             if (bodyMatch.length === 1) {
                 var body = bodyMatch[0];
-                var garbage = [];
+                var trash = [];
                 
-                garbage = removeNodes(garbage, 'script');
-                garbage = removeNodes(garbage, 'style');
+                trash = removeNodes(parser, trash, 'script');
+                trash = removeNodes(parser, trash, 'style');
                 
                 /* Remove any nodes we won't want injected. */
-                for (var i = 0, n = garbage.length; i < n; i++) {
-                    garbage[i].parentNode.removeChild(garbage[i]);
+                for (var i = 0, n = trash.length; i < n; i++) {
+                    trash[i].parentNode.removeChild(trash[i]);
                 }
                 
                 /* Inject the html. */
