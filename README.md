@@ -30,5 +30,6 @@ The scripts tags aren't removed to prevent [XSS](https://www.owasp.org/index.php
 ### Alternative frameworks
 
 * [html-imports-content](https://github.com/adjohnson916/html-imports-content) - Enables simple client-side page composition.
+* [wm-html-include](https://github.com/al-scvorets/wm-html-include.js) - Include external HTML page(s) into a comprising HTML page.
 
 This software is released under the [MIT License](http://opensource.org/licenses/MIT).
